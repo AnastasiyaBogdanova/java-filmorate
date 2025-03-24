@@ -51,6 +51,9 @@ public class UserController {
             if (newUser.getName() != null) {
                 oldUser.setName(newUser.getName());
             }
+            if (newUser.getLogin() != null) {
+                oldUser.setLogin(newUser.getLogin());
+            }
             log.info("newUser: " + oldUser.toString());
             return oldUser;
         }

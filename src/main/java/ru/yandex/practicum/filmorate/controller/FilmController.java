@@ -47,6 +47,9 @@ public class FilmController {
             if (newFilm.getDescription() != null) {
                 oldFilm.setDescription(newFilm.getDescription());
             }
+            if (newFilm.getName() != null) {
+                oldFilm.setName(newFilm.getName());
+            }
             log.info("newFilm: " + oldFilm);
             return oldFilm;
         }
