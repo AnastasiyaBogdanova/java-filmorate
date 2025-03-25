@@ -35,7 +35,6 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User newUser) {
-
         if (newUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
