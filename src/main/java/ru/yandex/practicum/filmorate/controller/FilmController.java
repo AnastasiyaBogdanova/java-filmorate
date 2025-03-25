@@ -35,25 +35,26 @@ public class FilmController {
         if (newFilm.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-        Film oldFilm = films.get(newFilm.getId());
-        if (films.containsKey(newFilm.getId())) {
-            log.info("oldFilm: " + oldFilm.toString());
-            if (newFilm.getReleaseDate() != null) {
-                oldFilm.setReleaseDate(newFilm.getReleaseDate());
-            }
-            if (newFilm.getDuration() != null) {
-                oldFilm.setDuration(newFilm.getDuration());
-            }
-            if (newFilm.getDescription() != null) {
-                oldFilm.setDescription(newFilm.getDescription());
-            }
-            if (newFilm.getName() != null) {
-                oldFilm.setName(newFilm.getName());
-            }
-            log.info("newFilm: " + oldFilm);
-            return oldFilm;
+
+        if (!films.containsKey(newFilm.getId())) {
+            throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
         }
-        throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
+        Film oldFilm = films.get(newFilm.getId());
+        log.info("oldFilm: " + oldFilm.toString());
+        if (newFilm.getReleaseDate() != null) {
+            oldFilm.setReleaseDate(newFilm.getReleaseDate());
+        }
+        if (newFilm.getDuration() != null) {
+            oldFilm.setDuration(newFilm.getDuration());
+        }
+        if (newFilm.getDescription() != null) {
+            oldFilm.setDescription(newFilm.getDescription());
+        }
+        if (newFilm.getName() != null) {
+            oldFilm.setName(newFilm.getName());
+        }
+        log.info("newFilm: " + oldFilm);
+        return oldFilm;
     }
 
     private long getNextId() {

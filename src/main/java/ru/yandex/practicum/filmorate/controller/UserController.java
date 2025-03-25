@@ -26,6 +26,9 @@ public class UserController {
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
         user.setId(getNextId());
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         users.put(user.getId(), user);
         return user;
     }
@@ -36,28 +39,28 @@ public class UserController {
         if (newUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-        User oldUser = users.get(newUser.getId());
-        if (users.containsKey(newUser.getId())) {
-            log.info("oldUser: " + oldUser.toString());
-            if (newUser.getName() != null) {
-                oldUser.setName(newUser.getName());
-            }
-            if (newUser.getBirthday() != null) {
-                oldUser.setBirthday(newUser.getBirthday());
-            }
-            if (newUser.getEmail() != null) {
-                oldUser.setEmail(newUser.getEmail());
-            }
-            if (newUser.getName() != null) {
-                oldUser.setName(newUser.getName());
-            }
-            if (newUser.getLogin() != null) {
-                oldUser.setLogin(newUser.getLogin());
-            }
-            log.info("newUser: " + oldUser.toString());
-            return oldUser;
+        if (!users.containsKey(newUser.getId())) {
+            throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
         }
-        throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
+        User oldUser = users.get(newUser.getId());
+        log.info("oldUser: " + oldUser.toString());
+        if (newUser.getName() != null) {
+            oldUser.setName(newUser.getName());
+        }
+        if (newUser.getBirthday() != null) {
+            oldUser.setBirthday(newUser.getBirthday());
+        }
+        if (newUser.getEmail() != null) {
+            oldUser.setEmail(newUser.getEmail());
+        }
+        if (newUser.getName() != null) {
+            oldUser.setName(newUser.getName());
+        }
+        if (newUser.getLogin() != null) {
+            oldUser.setLogin(newUser.getLogin());
+        }
+        log.info("newUser: " + oldUser.toString());
+        return oldUser;
     }
 
     private long getNextId() {
