@@ -25,12 +25,4 @@ public class ErrorHandler {
                 "description", e.getMessage()
         );
     }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleException(Exception e) {
-        return Map.of("error", "возникло исключение",
-                "description", e.getMessage()
-        );
-    }
 }
