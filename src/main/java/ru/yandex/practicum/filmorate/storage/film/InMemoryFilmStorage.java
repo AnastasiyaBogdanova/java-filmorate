@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -81,9 +82,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getPopularFilms(int count) {
         return filmHashMap.values().stream()
-                .sorted(Comparator.comparingLong(film -> film.getUserIdLikes().size()))
+                .sorted(Comparator.comparingLong((Film film) -> film.getUserIdLikes().size()).reversed())
                 .limit(count)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private long getNextId() {
