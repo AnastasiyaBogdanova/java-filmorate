@@ -21,4 +21,5 @@ public interface UserStorage {
 
     List<User> getAllFriends(Long userId);
 
+    Boolean checkUser(Long id);
 }

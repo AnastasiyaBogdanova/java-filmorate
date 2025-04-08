@@ -28,9 +28,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUserById(Long userId) {
-        if (!userHashMap.containsKey(userId)) {
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-        }
+        checkUser(userId);
         return userHashMap.get(userId);
     }
 
@@ -39,9 +37,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (newUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-        if (!userHashMap.containsKey(newUser.getId())) {
-            throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
-        }
+        checkUser(newUser.getId());
         User oldUser = userHashMap.get(newUser.getId());
         log.info("oldUser: " + oldUser.toString());
         if (newUser.getName() != null) {
@@ -70,12 +66,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User addFriend(Long userId, Long friendId) {
-        if (!userHashMap.containsKey(userId)) {
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-        }
-        if (!userHashMap.containsKey(friendId)) {
-            throw new NotFoundException("Пользователь с id = " + friendId + " не найден");
-        }
+        checkUser(userId);
+        checkUser(friendId);
         User user = userHashMap.get(userId);
         user.getFriends().add(friendId);
         log.info("user1: " + user);
@@ -90,12 +82,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User removeFriend(Long userId, Long friendId) {
-        if (!userHashMap.containsKey(userId)) {
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-        }
-        if (!userHashMap.containsKey(friendId)) {
-            throw new NotFoundException("Пользователь с id = " + friendId + " не найден");
-        }
+        checkUser(userId);
+        checkUser(friendId);
         User user = userHashMap.get(userId);
         user.getFriends().remove(friendId);
         log.info("user1: " + user);
@@ -111,12 +99,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getCommonFriends(Long userId, Long friendId) {
-        if (!userHashMap.containsKey(userId)) {
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-        }
-        if (!userHashMap.containsKey(friendId)) {
-            throw new NotFoundException("Пользователь с id = " + friendId + " не найден");
-        }
+        checkUser(userId);
+        checkUser(friendId);
         Set<Long> user = userHashMap.get(userId).getFriends();
         log.info("userId: " + userId + " " + user);
         Set<Long> friend = userHashMap.get(friendId).getFriends();
@@ -130,9 +114,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getAllFriends(Long userId) {
-        if (!userHashMap.containsKey(userId)) {
-            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-        }
+        checkUser(userId);
         return userHashMap.get(userId).getFriends().stream().map(userHashMap::get).toList();
     }
 
@@ -143,6 +125,13 @@ public class InMemoryUserStorage implements UserStorage {
                 .max()
                 .orElse(0);
         return ++currentMaxId;
+    }
+
+    public Boolean checkUser(Long id) {
+        if (!userHashMap.containsKey(id)) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
+        return true;
     }
 
 }
