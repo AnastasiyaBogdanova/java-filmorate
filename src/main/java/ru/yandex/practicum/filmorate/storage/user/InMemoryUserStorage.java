@@ -97,17 +97,17 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Пользователь с id = " + friendId + " не найден");
         }
         User user = userHashMap.get(userId);
-        if (!user.getFriends().contains(friendId)) {
+        /*if (!user.getFriends().contains(friendId)) {
             throw new NotFoundException("Пользователя с Id: " + friendId + " нет в друзьях");
-        }
+        }*/
         user.getFriends().remove(friendId);
         log.info("user1: " + user);
         userHashMap.put(userId, user);
 
         user = userHashMap.get(friendId);
-        if (!user.getFriends().contains(userId)) {
+        /*if (!user.getFriends().contains(userId)) {
             throw new NotFoundException("Пользователя с Id: " + userId + " нет в друзьях");
-        }
+        }*/
         user.getFriends().remove(userId);
         log.info("user2: " + user);
         userHashMap.put(friendId, user);
