@@ -88,9 +88,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (!filmHashMap.containsKey(filmId)) {
             throw new NotFoundException("Фильм с id = " + filmId + " не найден");
         }
-        if (!userHashMap.containsKey(userId)) {
+       /* if (!userHashMap.containsKey(userId)) {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
-        }
+        }*/
         Film film = filmHashMap.get(filmId);
         film.getUserIdLikes().remove(userId);
         log.info("film: " + film);
