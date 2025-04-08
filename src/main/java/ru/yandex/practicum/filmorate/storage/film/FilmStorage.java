@@ -9,6 +9,8 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
+    Film getFilmById(Long filmId);
+
     List<Film> getAllFilms();
 
     Film addLikeToFilm(Long userId, Long filmId);

@@ -27,6 +27,14 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public User getUserById(Long userId) {
+        if (!userHashMap.containsKey(userId)) {
+            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
+        }
+        return userHashMap.get(userId);
+    }
+
+    @Override
     public User updateUser(User newUser) {
         if (newUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");

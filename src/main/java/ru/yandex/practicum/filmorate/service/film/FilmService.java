@@ -25,6 +25,10 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
+    public Film getFilmById(Long filmId) {
+        return filmStorage.getFilmById(filmId);
+    }
+
     public List<Film> getAllFilms() {
         return filmStorage.getAllFilms();
     }
