@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -15,9 +17,9 @@ import java.util.Map;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> filmHashMap = new HashMap<>();
-    private final Map<Long, Film> userHashMap;
+    private final Map<Long, User> userHashMap;
 
-    public InMemoryFilmStorage(Map<Long, Film> userHashMap) {
+    public InMemoryFilmStorage(Map<Long, User> userHashMap) {
         this.userHashMap = userHashMap;
     }
 
