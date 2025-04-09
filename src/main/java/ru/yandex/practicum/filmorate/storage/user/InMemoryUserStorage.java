@@ -2,14 +2,9 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -28,16 +23,11 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUserById(Long userId) {
-        checkUser(userId);
         return userHashMap.get(userId);
     }
 
     @Override
     public User updateUser(User newUser) {
-        if (newUser.getId() == null) {
-            throw new ValidationException("Id должен быть указан");
-        }
-        checkUser(newUser.getId());
         User oldUser = userHashMap.get(newUser.getId());
         log.info("oldUser: " + oldUser.toString());
         if (newUser.getName() != null) {
@@ -66,8 +56,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User addFriend(Long userId, Long friendId) {
-        checkUser(userId);
-        checkUser(friendId);
         User user = userHashMap.get(userId);
         user.getFriends().add(friendId);
         log.info("user1: " + user);
@@ -82,8 +70,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User removeFriend(Long userId, Long friendId) {
-        checkUser(userId);
-        checkUser(friendId);
         User user = userHashMap.get(userId);
         user.getFriends().remove(friendId);
         log.info("user1: " + user);
@@ -99,8 +85,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getCommonFriends(Long userId, Long friendId) {
-        checkUser(userId);
-        checkUser(friendId);
         Set<Long> user = userHashMap.get(userId).getFriends();
         log.info("userId: " + userId + " " + user);
         Set<Long> friend = userHashMap.get(friendId).getFriends();
@@ -114,8 +98,15 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getAllFriends(Long userId) {
-        checkUser(userId);
         return userHashMap.get(userId).getFriends().stream().map(userHashMap::get).toList();
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        if (userHashMap.containsKey(id)) {
+            return Optional.of(userHashMap.get(id));
+        }
+        return Optional.empty();
     }
 
     private long getNextId() {
@@ -126,12 +117,4 @@ public class InMemoryUserStorage implements UserStorage {
                 .orElse(0);
         return ++currentMaxId;
     }
-
-    public Boolean checkUser(Long id) {
-        if (!userHashMap.containsKey(id)) {
-            throw new NotFoundException("Пользователь с id = " + id + " не найден");
-        }
-        return true;
-    }
-
 }

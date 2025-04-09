@@ -2,14 +2,9 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,16 +21,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(Long filmId) {
-        checkFilm(filmId);
         return filmHashMap.get(filmId);
     }
 
     @Override
     public Film updateFilm(Film newFilm) {
-        if (newFilm.getId() == null) {
-            throw new ValidationException("Id должен быть указан");
-        }
-        checkFilm(newFilm.getId());
         Film oldFilm = filmHashMap.get(newFilm.getId());
         log.info("oldFilm: " + oldFilm.toString());
         if (newFilm.getReleaseDate() != null) {
@@ -61,7 +51,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addLikeToFilm(Long filmId, Long userId) {
-        checkFilm(filmId);
         Film film = filmHashMap.get(filmId);
         film.getUserIdLikes().add(userId);
         log.info("film: " + film);
@@ -71,7 +60,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film removeLikeFromFilm(Long filmId, Long userId) {
-        checkFilm(filmId);
         Film film = filmHashMap.get(filmId);
         film.getUserIdLikes().remove(userId);
         log.info("film: " + film);
@@ -87,6 +75,14 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<Film> findById(Long id) {
+        if (filmHashMap.containsKey(id)) {
+            return Optional.of(filmHashMap.get(id));
+        }
+        return Optional.empty();
+    }
+
     private long getNextId() {
         long currentMaxId = filmHashMap.keySet()
                 .stream()
@@ -94,12 +90,5 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .max()
                 .orElse(0);
         return ++currentMaxId;
-    }
-
-    private Boolean checkFilm(Long id) {
-        if (!filmHashMap.containsKey(id)) {
-            throw new NotFoundException("Фильм с id = " + id + " не найден");
-        }
-        return true;
     }
 }
