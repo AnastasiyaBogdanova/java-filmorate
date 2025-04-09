@@ -45,13 +45,11 @@ public class FilmService {
         return filmStorage.addLikeToFilm(filmId, userId);
     }
 
-
     public Film removeLikeFromFilm(Long filmId, Long userId) {
         findFilmById(filmId);
         findUserById(userId);
         return filmStorage.removeLikeFromFilm(filmId, userId);
     }
-
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
@@ -60,6 +58,7 @@ public class FilmService {
     private User findUserById(Long id) {
         return userStorage.findById(id).orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден"));
     }
+
     private Film findFilmById(Long id) {
         return filmStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм с id = " + id + " не найден"));
     }
