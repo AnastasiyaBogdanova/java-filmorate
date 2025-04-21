@@ -24,4 +24,6 @@ public class Film {
     @Positive
     private Integer duration;
     private Set<Long> userIdLikes = new HashSet<>();
+    private Set<String> genre = new HashSet<>();
+    private String rating;
 }
