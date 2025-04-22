@@ -22,8 +22,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(Long userId) {
-        return userHashMap.get(userId);
+    public Optional<User> getUserById(Long userId) {
+        return Optional.of(userHashMap.get(userId));
     }
 
     @Override

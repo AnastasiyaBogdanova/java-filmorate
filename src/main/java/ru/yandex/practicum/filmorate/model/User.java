@@ -25,5 +25,4 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
     private Set<Long> friends = new HashSet<>();
-    private String status;
 }
