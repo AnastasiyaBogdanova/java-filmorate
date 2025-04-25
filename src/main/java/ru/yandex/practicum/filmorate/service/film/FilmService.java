@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service.film;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 
 
 @Service
-@Component
 public class FilmService {
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;

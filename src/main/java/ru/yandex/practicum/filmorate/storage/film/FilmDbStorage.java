@@ -17,7 +17,11 @@ import java.util.stream.Collectors;
 @Repository
 public class FilmDbStorage extends BaseRepository implements FilmStorage {
     private final JdbcTemplate jdbc;
-    private static final String FIND_ALL_QUERY = "SELECT f.*, m.name as mpa_name FROM films f LEFT JOIN mpas m on f.mpa = m.id";
+    private static final String FIND_ALL_QUERY =
+            "SELECT f.*, m.id AS mpa_id, m.name AS mpa_name " +
+                    "FROM films f " +
+                    "LEFT JOIN mpas m ON f.mpa = m.id";
+
     private static final String FIND_BY_ID_QUERY =
             "SELECT f.*, r.name AS mpa_name FROM films f JOIN mpas r ON f.mpa = r.id WHERE f.id = ?";
 
@@ -32,7 +36,6 @@ public class FilmDbStorage extends BaseRepository implements FilmStorage {
             "FROM films f LEFT JOIN likes l ON f.id = l.film_id " +
             "LEFT JOIN mpas m ON f.mpa = m.id " +
             "GROUP BY f.id ORDER BY likes_count DESC LIMIT ?";
-
 
     public FilmDbStorage(JdbcTemplate jdbc, @Qualifier("filmMapper") RowMapper mapper) {
         super(jdbc, mapper);
@@ -59,9 +62,7 @@ public class FilmDbStorage extends BaseRepository implements FilmStorage {
 
     @Override
     public Film updateFilm(Film newFilm) {
-        System.out.println("newFilm " + newFilm);
         Film currentFilm = getFilmById(newFilm.getId()).get();
-        System.out.println("currentFilm " + currentFilm);
         if (newFilm.getName() != null) {
             currentFilm.setName(newFilm.getName());
         }
@@ -109,12 +110,47 @@ public class FilmDbStorage extends BaseRepository implements FilmStorage {
     @Override
     public List<Film> getAllFilms() {
         List<Film> films = findMany(FIND_ALL_QUERY);
-        films.forEach(film -> {
-            film.setUserIdLikes(loadLikesForFilm(film.getId()));
-            film.setGenres(loadGenresForFilm(film.getId()));
-            film.setMpa(loadMpaForFilm(film.getId()));
-        });
+        if (films.size() > 0) {
+            Map<Long, Set<Long>> likesByFilmId = loadAllLikes(); //загружаем все лайки ко всем фильмам
+            Map<Long, List<Genre>> genresByFilmId = loadAllGenres();//загружаем все жанры ко всем фильмам
+
+            films.forEach(film -> {
+                film.setUserIdLikes(likesByFilmId.keySet());
+                film.setGenres(genresByFilmId.getOrDefault(film.getId(), new ArrayList<>()));
+            });
+        }
         return films;
+    }
+
+    private Map<Long, Set<Long>> loadAllLikes() {
+        String sql = "SELECT film_id, user_id FROM likes";
+        List<Map<String, Object>> rows = jdbc.queryForList(sql);
+
+        Map<Long, Set<Long>> likesMap = new HashMap<>();
+        for (Map<String, Object> row : rows) {
+            Long filmId = ((Number) row.get("film_id")).longValue();
+            Long userId = ((Number) row.get("user_id")).longValue();
+            likesMap.computeIfAbsent(filmId, k -> new HashSet<>()).add(userId);
+        }
+        return likesMap;
+    }
+
+    private Map<Long, List<Genre>> loadAllGenres() {
+        String sql = "SELECT fg.film_id, g.id, g.name " +
+                "FROM film_genres fg " +
+                "JOIN genres g ON fg.genre_id = g.id ";
+        List<Map<String, Object>> rows = jdbc.queryForList(sql);
+
+        Map<Long, List<Genre>> genresMap = new HashMap<>();
+        for (Map<String, Object> row : rows) {
+            Long filmId = ((Number) row.get("film_id")).longValue();
+            Genre genre = new Genre();
+            genre.setId(((Number) row.get("id")).longValue());
+            genre.setName((String) row.get("name"));
+
+            genresMap.computeIfAbsent(filmId, k -> new ArrayList<>()).add(genre);
+        }
+        return genresMap;
     }
 
     @Override
