@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.validation.AfterDate;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,4 +25,6 @@ public class Film {
     @Positive
     private Integer duration;
     private Set<Long> userIdLikes = new HashSet<>();
+    private Mpa mpa;
+    private Collection<Genre> genres;
 }
