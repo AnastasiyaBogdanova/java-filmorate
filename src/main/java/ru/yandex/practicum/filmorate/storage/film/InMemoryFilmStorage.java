@@ -20,8 +20,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(Long filmId) {
-        return filmHashMap.get(filmId);
+    public Optional<Film> getFilmById(Long filmId) {
+        return Optional.of(filmHashMap.get(filmId));
     }
 
     @Override
@@ -75,7 +75,6 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
-    @Override
     public Optional<Film> findById(Long id) {
         if (filmHashMap.containsKey(id)) {
             return Optional.of(filmHashMap.get(id));

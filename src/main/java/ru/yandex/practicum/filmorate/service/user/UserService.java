@@ -1,68 +1,76 @@
 package ru.yandex.practicum.filmorate.service.user;
 
 
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
-@Component
+@RequiredArgsConstructor
 public class UserService {
 
-    private final UserStorage userStorage;
+    private final UserDbStorage userStorage;
 
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserDto createUser(User user) {
+        return UserMapper.mapToUserDto(userStorage.createUser(user));
     }
 
-    public User createUser(User user) {
-        return userStorage.createUser(user);
-    }
-
-    public User updateUser(User user) {
+    public UserDto updateUser(User user) {
         if (user.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
         findUserById(user.getId());
-        return userStorage.updateUser(user);
+        return UserMapper.mapToUserDto(userStorage.updateUser(user));
     }
 
-    public List<User> getAllUsers() {
-        return userStorage.getAllUsers();
+    public List<UserDto> getAllUsers() {
+        return userStorage.getAllUsers()
+                .stream()
+                .map(UserMapper::mapToUserDto)
+                .collect(Collectors.toList());
     }
 
-    public User getUserById(Long userId) {
-        findUserById(userId);
-        return userStorage.getUserById(userId);
+    public Optional<UserDto> getUserById(Long userId) {
+        return Optional.of(UserMapper.mapToUserDto(findUserById(userId)));
     }
 
-    public User addFriend(Long userId, Long friendId) {
-        findUserById(userId);
-        findUserById(friendId);
-        return userStorage.addFriend(userId, friendId);
-    }
-
-
-    public User removeFriend(Long userId, Long friendId) {
+    public UserDto addFriend(Long userId, Long friendId) {
         findUserById(userId);
         findUserById(friendId);
-        return userStorage.removeFriend(userId, friendId);
+        return UserMapper.mapToUserDto(userStorage.addFriend(userId, friendId));
     }
 
-    public List<User> getAllFriends(Long userId) {
-        findUserById(userId);
-        return userStorage.getAllFriends(userId);
-    }
 
-    public List<User> getCommonFriends(Long userId, Long friendId) {
+    public UserDto removeFriend(Long userId, Long friendId) {
         findUserById(userId);
         findUserById(friendId);
-        return userStorage.getCommonFriends(userId, friendId);
+        return UserMapper.mapToUserDto(userStorage.removeFriend(userId, friendId));
+    }
+
+    public List<UserDto> getAllFriends(Long userId) {
+        findUserById(userId);
+        return userStorage.getAllFriends(userId)
+                .stream()
+                .map(UserMapper::mapToUserDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDto> getCommonFriends(Long userId, Long friendId) {
+        findUserById(userId);
+        findUserById(friendId);
+        return userStorage.getCommonFriends(userId, friendId)
+                .stream()
+                .map(UserMapper::mapToUserDto)
+                .collect(Collectors.toList());
     }
 
     private User findUserById(Long id) {
